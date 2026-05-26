@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyAI – Your Smart Study Buddy</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink: #FF6B9D;
+  --orange: #FF9F43;
+  --yellow: #FFD93D;
+  --green: #6BCB77;
+  --teal: #4ECDC4;
+  --blue: #45B7D1;
+  --purple: #A29BFE;
+  --coral: #FF7675;
+  --bg: #FFF9F0;
+  --card: #FFFFFF;
+  --text: #2D3436;
+  --muted: #636E72;
+  --border: #F0E6D3;
+  --shadow: rgba(255,107,157,0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+/* === FLOATING BLOBS === */
+.blob-bg { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; }
+.blob { position:absolute; border-radius:50%; opacity:0.12; animation:blobFloat 8s ease-in-out infinite; }
+.blob1 { width:320px; height:320px; background:var(--pink); top:-80px; left:-80px; animation-delay:0s; }
+.blob2 { width:260px; height:260px; background:var(--teal); top:30%; right:-60px; animation-delay:2s; }
+.blob3 { width:200px; height:200px; background:var(--yellow); bottom:10%; left:10%; animation-delay:4s; }
+.blob4 { width:180px; height:180px; background:var(--purple); top:60%; right:20%; animation-delay:1s; }
+@keyframes blobFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-20px) scale(1.05)} }
+
+/* === NAV === */
+nav { position:sticky; top:0; z-index:100; background:rgba(255,249,240,0.92); backdrop-filter:blur(12px); border-bottom:2px solid var(--border); padding:12px 24px; display:flex; align-items:center; justify-content:space-between; }
+.logo { font-family:'Fredoka One',cursive; font-size:26px; background:linear-gradient(135deg,var(--pink),var(--orange)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.logo span { color:var(--teal); -webkit-text-fill-color:var(--teal); }
+.nav-right { display:flex; align-items:center; gap:12px; }
+.lang-toggle { display:flex; background:var(--border); border-radius:20px; padding:3px; gap:2px; }
+.lang-btn { padding:5px 12px; border-radius:16px; border:none; font-family:'Nunito',sans-serif; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; background:transparent; color:var(--muted); }
+.lang-btn.active { background:white; color:var(--pink); box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+.nav-badge { background:linear-gradient(135deg,var(--pink),var(--coral)); color:white; padding:6px 16px; border-radius:20px; font-size:13px; font-weight:800; border:none; cursor:pointer; transition:transform 0.15s; }
+.nav-badge:hover { transform:scale(1.05); }
+
+/* === HERO === */
+.hero { position:relative; z-index:1; text-align:center; padding:48px 20px 32px; }
+.hero-mascot { width:120px; height:120px; margin:0 auto 16px; animation:bounce 2s ease-in-out infinite; display:flex; align-items:center; justify-content:center; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+.hero-mascot svg { width:100%; height:100%; }
+.hero h1 { font-family:'Fredoka One',cursive; font-size:clamp(2rem,5vw,3.2rem); line-height:1.1; margin-bottom:12px; }
+.hero h1 .g1 { color:var(--pink); }
+.hero h1 .g2 { color:var(--orange); }
+.hero h1 .g3 { color:var(--teal); }
+.hero p { font-size:16px; color:var(--muted); max-width:480px; margin:0 auto 28px; line-height:1.6; font-weight:600; }
+.star-row { display:flex; justify-content:center; gap:6px; margin-bottom:24px; }
+.star { width:10px; height:10px; border-radius:50%; animation:starPop 1.5s ease-in-out infinite; }
+.star:nth-child(1){background:var(--pink);animation-delay:0s}
+.star:nth-child(2){background:var(--orange);animation-delay:0.2s}
+.star:nth-child(3){background:var(--yellow);animation-delay:0.4s}
+.star:nth-child(4){background:var(--green);animation-delay:0.6s}
+.star:nth-child(5){background:var(--teal);animation-delay:0.8s}
+@keyframes starPop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.6)} }
+
+/* === SELECTOR CARD === */
+.selector-wrap { position:relative; z-index:1; max-width:560px; margin:0 auto 40px; padding:0 16px; }
+.selector-card { background:white; border-radius:24px; padding:24px; border:3px solid var(--border); box-shadow:0 8px 32px var(--shadow); }
+.selector-card h3 { font-family:'Fredoka One',cursive; font-size:18px; color:var(--pink); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+.selects-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+.fancy-select { position:relative; }
+.fancy-select select { width:100%; padding:12px 16px; border-radius:14px; border:2px solid var(--border); font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; color:var(--text); background:var(--bg); cursor:pointer; appearance:none; outline:none; transition:border-color 0.2s; }
+.fancy-select select:focus { border-color:var(--pink); }
+.fancy-select::after { content:'▾'; position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; font-size:14px; }
+.chapter-select { width:100%; padding:12px 16px; border-radius:14px; border:2px solid var(--border); font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; color:var(--text); background:var(--bg); cursor:pointer; appearance:none; outline:none; margin-bottom:14px; transition:border-color 0.2s; }
+.chapter-select:focus { border-color:var(--pink); }
+.gen-btn { width:100%; padding:15px; border-radius:16px; border:none; background:linear-gradient(135deg,var(--pink),var(--orange)); color:white; font-family:'Fredoka One',cursive; font-size:18px; cursor:pointer; transition:transform 0.15s,box-shadow 0.15s; box-shadow:0 6px 20px rgba(255,107,157,0.4); display:flex; align-items:center; justify-content:center; gap:8px; }
+.gen-btn:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(255,107,157,0.5); }
+.gen-btn:active { transform:translateY(0); }
+.gen-btn.loading { background:linear-gradient(135deg,var(--muted),#b2bec3); cursor:not-allowed; }
+
+/* === LOADING === */
+.loading-bar { width:0%; height:6px; background:linear-gradient(90deg,var(--pink),var(--orange),var(--yellow)); border-radius:3px; transition:width 0.4s; margin-top:12px; border-radius:10px; }
+.loading-text { text-align:center; font-size:13px; font-weight:700; color:var(--pink); margin-top:8px; min-height:20px; }
+
+/* === TABS === */
+.tabs-wrap { position:relative; z-index:1; max-width:760px; margin:0 auto; padding:0 16px; display:none; }
+.tabs { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:20px; scrollbar-width:none; }
+.tabs::-webkit-scrollbar { display:none; }
+.tab-btn { flex-shrink:0; padding:10px 18px; border-radius:20px; border:2px solid var(--border); background:white; font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; cursor:pointer; transition:all 0.2s; color:var(--muted); display:flex; align-items:center; gap:6px; }
+.tab-btn.active { color:white; border-color:transparent; transform:scale(1.04); }
+.tab-btn:nth-child(1).active{background:linear-gradient(135deg,var(--pink),var(--coral))}
+.tab-btn:nth-child(2).active{background:linear-gradient(135deg,var(--orange),var(--yellow))}
+.tab-btn:nth-child(3).active{background:linear-gradient(135deg,var(--teal),var(--blue))}
+.tab-btn:nth-child(4).active{background:linear-gradient(135deg,var(--purple),var(--pink))}
+.tab-btn:nth-child(5).active{background:linear-gradient(135deg,var(--green),var(--teal))}
+
+/* === PANELS === */
+.panel { display:none; animation:panelIn 0.4s ease; }
+.panel.active { display:block; }
+@keyframes panelIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+/* === SUMMARY PANEL === */
+.content-card { background:white; border-radius:20px; border:2px solid var(--border); padding:24px; margin-bottom:16px; box-shadow:0 4px 16px rgba(0,0,0,0.05); }
+.card-header { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.card-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.card-title { font-family:'Fredoka One',cursive; font-size:17px; }
+.summary-text { font-size:15px; line-height:1.8; color:var(--text); white-space:pre-wrap; }
+.key-points { list-style:none; display:flex; flex-direction:column; gap:10px; }
+.key-points li { display:flex; align-items:flex-start; gap:10px; font-size:14px; line-height:1.5; font-weight:600; }
+.kp-dot { width:22px; height:22px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; font-size:11px; font-weight:900; margin-top:1px; }
+
+/* === QUIZ PANEL === */
+.quiz-header-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
+.level-pills { display:flex; gap:6px; }
+.level-pill { padding:7px 16px; border-radius:20px; font-size:12px; font-weight:800; border:none; cursor:pointer; font-family:'Nunito',sans-serif; transition:all 0.2s; opacity:0.6; }
+.level-pill.active { opacity:1; transform:scale(1.06); }
+.level-pill.easy { background:#D4EFDF; color:#1E8449; }
+.level-pill.easy.active { background:#27AE60; color:white; }
+.level-pill.medium { background:#FDEBD0; color:#E67E22; }
+.level-pill.medium.active { background:#E67E22; color:white; }
+.level-pill.hard { background:#FADBD8; color:#C0392B; }
+.level-pill.hard.active { background:#E74C3C; color:white; }
+.q-counter { font-size:13px; font-weight:800; color:var(--muted); }
+.quiz-card { background:white; border-radius:20px; border:2px solid var(--border); padding:22px; box-shadow:0 4px 16px rgba(0,0,0,0.05); }
+.q-text { font-size:16px; font-weight:700; line-height:1.5; margin-bottom:18px; color:var(--text); }
+.options { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+.opt-btn { padding:13px 16px; border-radius:14px; border:2px solid var(--border); background:var(--bg); font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; cursor:pointer; text-align:left; transition:all 0.18s; color:var(--text); }
+.opt-btn:hover:not(:disabled) { border-color:var(--teal); background:#E8F8F8; transform:translateX(4px); }
+.opt-btn.correct { border-color:var(--green); background:#D4EFDF; color:#1E8449; }
+.opt-btn.wrong { border-color:var(--coral); background:#FADBD8; color:#C0392B; }
+.opt-btn:disabled { cursor:default; }
+.explanation-box { background:#FFF9F0; border:2px solid var(--yellow); border-radius:14px; padding:14px; font-size:13px; font-weight:600; line-height:1.6; color:var(--text); margin-bottom:12px; display:none; }
+.q-nav { display:flex; align-items:center; justify-content:space-between; }
+.nav-btn { padding:10px 20px; border-radius:12px; border:2px solid var(--border); background:white; font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; cursor:pointer; transition:all 0.15s; }
+.nav-btn:hover { border-color:var(--teal); color:var(--teal); }
+.nav-btn.primary { background:linear-gradient(135deg,var(--teal),var(--blue)); color:white; border-color:transparent; }
+.progress-strip { display:flex; gap:3px; margin-bottom:14px; flex-wrap:wrap; }
+.p-dot { width:14px; height:14px; border-radius:50%; background:var(--border); transition:background 0.3s; }
+.p-dot.answered { background:var(--teal); }
+.p-dot.correct { background:var(--green); }
+.p-dot.wrong { background:var(--coral); }
+.score-board { text-align:center; padding:24px; }
+.score-board h2 { font-family:'Fredoka One',cursive; font-size:28px; margin-bottom:8px; }
+.score-circle { width:120px; height:120px; border-radius:50%; margin:16px auto; display:flex; align-items:center; justify-content:center; flex-direction:column; border:6px solid var(--green); }
+.score-num { font-family:'Fredoka One',cursive; font-size:32px; color:var(--green); }
+.score-total { font-size:13px; color:var(--muted); font-weight:700; }
+
+/* === FLASHCARDS === */
+.flashcard-wrap { perspective:1000px; margin-bottom:16px; }
+.flashcard { width:100%; min-height:200px; position:relative; transform-style:preserve-3d; transition:transform 0.6s; cursor:pointer; }
+.flashcard.flipped { transform:rotateY(180deg); }
+.fc-front, .fc-back { position:absolute; width:100%; min-height:200px; backface-visibility:hidden; border-radius:20px; padding:28px; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; border:2px solid var(--border); }
+.fc-front { background:linear-gradient(135deg,#FFF5FB,#FFF0E0); }
+.fc-back { background:linear-gradient(135deg,#E8FFF5,#E0F5FF); transform:rotateY(180deg); }
+.fc-label { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; opacity:0.6; }
+.fc-text { font-size:17px; font-weight:700; line-height:1.5; }
+.fc-hint { font-size:12px; color:var(--muted); margin-top:12px; font-weight:600; }
+.fc-nav { display:flex; align-items:center; justify-content:center; gap:16px; margin-top:8px; }
+.fc-nav-btn { width:44px; height:44px; border-radius:50%; border:2px solid var(--border); background:white; font-size:18px; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; justify-content:center; }
+.fc-nav-btn:hover { border-color:var(--purple); transform:scale(1.1); }
+.fc-count { font-size:14px; font-weight:800; color:var(--muted); }
+
+/* === MINDMAP === */
+.mindmap-svg { width:100%; max-height:420px; }
+
+/* === AUDIO PANEL === */
+.audio-modes { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+.audio-mode-btn { padding:8px 14px; border-radius:16px; border:2px solid var(--border); background:white; font-family:'Nunito',sans-serif; font-size:12px; font-weight:800; cursor:pointer; transition:all 0.2s; color:var(--muted); }
+.audio-mode-btn.active { background:linear-gradient(135deg,var(--green),var(--teal)); color:white; border-color:transparent; }
+.audio-player-card { background:linear-gradient(135deg,#FFF5FB,#F0FFF9); border:2px solid var(--border); border-radius:20px; padding:22px; }
+.audio-art { width:80px; height:80px; border-radius:18px; background:linear-gradient(135deg,var(--pink),var(--orange)); margin:0 auto 14px; display:flex; align-items:center; justify-content:center; font-size:36px; animation:artPulse 2s ease-in-out infinite; }
+@keyframes artPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+.audio-title { text-align:center; font-family:'Fredoka One',cursive; font-size:17px; margin-bottom:4px; color:var(--text); }
+.audio-sub { text-align:center; font-size:12px; color:var(--muted); font-weight:600; margin-bottom:16px; }
+.waveform-vis { display:flex; align-items:center; justify-content:center; gap:3px; height:40px; margin-bottom:14px; }
+.w-bar { width:4px; border-radius:2px; background:var(--pink); transition:height 0.1s; }
+.audio-progress { margin-bottom:10px; }
+.progress-track { height:6px; background:var(--border); border-radius:3px; cursor:pointer; position:relative; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--pink),var(--orange)); border-radius:3px; transition:width 0.3s; }
+.time-row { display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:var(--muted); margin-top:4px; }
+.audio-controls { display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:16px; }
+.ac-btn { width:38px; height:38px; border-radius:50%; border:2px solid var(--border); background:white; font-size:16px; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; justify-content:center; }
+.ac-btn:hover { border-color:var(--pink); transform:scale(1.1); }
+.ac-play { width:52px; height:52px; background:linear-gradient(135deg,var(--pink),var(--coral)); color:white; border:none; border-radius:50%; font-size:22px; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(255,107,157,0.4); }
+.ac-play:hover { transform:scale(1.08); }
+.lang-row { display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; }
+.lang-audio-btn { padding:7px 16px; border-radius:16px; border:2px solid var(--border); background:white; font-family:'Nunito',sans-serif; font-size:12px; font-weight:800; cursor:pointer; transition:all 0.2s; color:var(--muted); }
+.lang-audio-btn.active { background:linear-gradient(135deg,var(--teal),var(--blue)); color:white; border-color:transparent; }
+.speed-control { display:flex; align-items:center; gap:8px; margin-top:12px; justify-content:center; }
+.speed-btn { padding:5px 10px; border-radius:10px; border:2px solid var(--border); background:white; font-family:'Nunito',sans-serif; font-size:11px; font-weight:800; cursor:pointer; color:var(--muted); transition:all 0.15s; }
+.speed-btn.active { background:var(--orange); color:white; border-color:transparent; }
+
+/* === CONFETTI === */
+.confetti-piece { position:fixed; width:10px; height:10px; border-radius:2px; pointer-events:none; z-index:9999; animation:confettiFall 2.5s ease-out forwards; }
+@keyframes confettiFall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+
+/* === RESPONSIVE === */
+@media(max-width:600px){
+  nav{padding:10px 14px;}
+  .logo{font-size:20px;}
+  .hero{padding:32px 14px 20px;}
+  .hero-mascot{width:90px;height:90px;}
+  .hero h1{font-size:1.8rem;}
+  .selects-grid{grid-template-columns:1fr;}
+  .tabs-wrap{padding:0 10px;}
+  .content-card{padding:16px;}
+  .quiz-card{padding:16px;}
+  .audio-player-card{padding:16px;}
+}
+@media(min-width:900px){
+  .hero{padding:60px 20px 40px;}
+  .hero h1{font-size:3.4rem;}
+  .hero-mascot{width:140px;height:140px;}
+}
+
+/* === SKELETON === */
+.skeleton { background:linear-gradient(90deg,#f0e6d3 25%,#f9f0e0 50%,#f0e6d3 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:10px; }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* === TOAST === */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--text); color:white; padding:12px 24px; border-radius:14px; font-size:14px; font-weight:700; z-index:10000; transition:transform 0.3s; pointer-events:none; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="blob-bg">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+  <div class="blob blob4"></div>
+</div>
+
+<nav>
+  <div class="logo">Study<span>AI</span> 🎓</div>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setUILang('en')">EN</button>
+      <button class="lang-btn" onclick="setUILang('hi')">हि</button>
+    </div>
+    <button class="nav-badge" onclick="scrollToSelector()">✨ Start Free</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-mascot">
+    <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <!-- Body -->
+      <ellipse cx="60" cy="75" rx="32" ry="28" fill="#FFD93D"/>
+      <!-- Head -->
+      <circle cx="60" cy="45" r="30" fill="#FFE082"/>
+      <!-- Eyes -->
+      <circle cx="50" cy="42" r="7" fill="white"/>
+      <circle cx="70" cy="42" r="7" fill="white"/>
+      <circle cx="52" cy="43" r="4" fill="#2D3436"/>
+      <circle cx="72" cy="43" r="4" fill="#2D3436"/>
+      <circle cx="53" cy="42" r="1.5" fill="white"/>
+      <circle cx="73" cy="42" r="1.5" fill="white"/>
+      <!-- Smile -->
+      <path d="M52 54 Q60 62 68 54" stroke="#2D3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- Cheeks -->
+      <circle cx="44" cy="52" r="6" fill="#FF6B9D" opacity="0.5"/>
+      <circle cx="76" cy="52" r="6" fill="#FF6B9D" opacity="0.5"/>
+      <!-- Graduation cap -->
+      <rect x="36" y="16" width="48" height="8" rx="3" fill="#2D3436"/>
+      <polygon points="60,4 36,18 84,18" fill="#2D3436"/>
+      <line x1="84" y1="18" x2="92" y2="30" stroke="#FF9F43" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="92" cy="32" r="4" fill="#FF9F43"/>
+      <!-- Arms -->
+      <ellipse cx="30" cy="80" rx="10" ry="16" rx="10" fill="#FFD93D" transform="rotate(-20 30 80)"/>
+      <ellipse cx="90" cy="80" rx="10" ry="16" fill="#FFD93D" transform="rotate(20 90 80)"/>
+      <!-- Book in hand -->
+      <rect x="88" y="76" width="18" height="22" rx="3" fill="#FF6B9D"/>
+      <rect x="89" y="77" width="8" height="20" rx="2" fill="#FF8FAD"/>
+      <line x1="93" y1="80" x2="103" y2="80" stroke="white" stroke-width="1.5"/>
+      <line x1="93" y1="84" x2="103" y2="84" stroke="white" stroke-width="1.5"/>
+      <line x1="93" y1="88" x2="103" y2="88" stroke="white" stroke-width="1.5"/>
+    </svg>
+  </div>
+  <div class="star-row"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div>
+  <h1 id="hero-title"><span class="g1">Study</span> <span class="g2">Smarter,</span><br><span class="g3">Score Higher! 🚀</span></h1>
+  <p id="hero-sub">Pick your grade and chapter — AI instantly builds your complete study kit with quizzes, flashcards, audio & more!</p>
+</section>
+
+<!-- SELECTOR -->
+<div class="selector-wrap" id="selectorSection">
+  <div class="selector-card">
+    <h3>📚 <span id="sel-title">Choose Your Chapter</span></h3>
+    <div class="selects-grid">
+      <div class="fancy-select">
+        <select id="gradeSelect" onchange="updateChapters()">
+          <option value="">Select Grade</option>
+          <option value="6">Grade 6</option>
+          <option value="7">Grade 7</option>
+          <option value="8">Grade 8</option>
+          <option value="9">Grade 9</option>
+          <option value="10">Grade 10</option>
+          <option value="11">Grade 11 (Science)</option>
+          <option value="12">Grade 12 (Science)</option>
+        </select>
+      </div>
+      <div class="fancy-select">
+        <select id="subjectSelect" onchange="updateChapters()">
+          <option value="">Select Subject</option>
+          <option value="science">Science</option>
+          <option value="maths">Mathematics</option>
+          <option value="english">English</option>
+          <option value="history">History</option>
+          <option value="geography">Geography</option>
+        </select>
+      </div>
+    </div>
+    <div class="fancy-select" style="margin-bottom:14px">
+      <select class="chapter-select" id="chapterSelect">
+        <option value="">— Select Chapter —</option>
+      </select>
+    </div>
+    <button class="gen-btn" id="genBtn" onclick="generateAll()">
+      <span>🪄</span> <span id="genBtnText">Generate My Study Kit!</span>
+    </button>
+    <div class="loading-bar" id="loadingBar"></div>
+    <div class="loading-text" id="loadingText"></div>
+  </div>
+</div>
+
+<!-- TABS + PANELS -->
+<div class="tabs-wrap" id="tabsWrap">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showPanel('summary',this)">📖 Summary</button>
+    <button class="tab-btn" onclick="showPanel('quiz',this)">🎯 Quiz (45 Qs)</button>
+    <button class="tab-btn" onclick="showPanel('flashcards',this)">🃏 Flashcards</button>
+    <button class="tab-btn" onclick="showPanel('mindmap',this)">🗺️ Mind Map</button>
+    <button class="tab-btn" onclick="showPanel('audio',this)">🎙️ Audio</button>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="panel active" id="panel-summary">
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#FFF0FB">📝</div>
+        <div class="card-title" style="color:var(--pink)" id="summary-chapter-name">Chapter Summary</div>
+      </div>
+      <div class="summary-text" id="summaryText"></div>
+    </div>
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#FFF8E0">⭐</div>
+        <div class="card-title" style="color:var(--orange)">Key Points to Remember</div>
+      </div>
+      <ul class="key-points" id="keyPointsList"></ul>
+    </div>
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#E8FFF5">🎯</div>
+        <div class="card-title" style="color:var(--green)">Exam Prediction</div>
+      </div>
+      <ul class="key-points" id="examPredList"></ul>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="panel" id="panel-quiz">
+    <div class="quiz-header-bar">
+      <div class="level-pills">
+        <button class="level-pill easy active" onclick="setLevel('easy',this)">🟢 Easy</button>
+        <button class="level-pill medium" onclick="setLevel('medium',this)">🟡 Medium</button>
+        <button class="level-pill hard" onclick="setLevel('hard',this)">🔴 Hard</button>
+      </div>
+      <div class="q-counter" id="qCounter">Q 1 / 15</div>
+    </div>
+    <div class="progress-strip" id="progressStrip"></div>
+    <div class="quiz-card" id="quizCard">
+      <div class="q-text" id="qText">Loading questions...</div>
+      <div class="options" id="qOptions"></div>
+      <div class="explanation-box" id="explanationBox"></div>
+      <div class="q-nav">
+        <button class="nav-btn" onclick="prevQ()">← Prev</button>
+        <button class="nav-btn primary" id="nextQBtn" onclick="nextQ()">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div class="panel" id="panel-flashcards">
+    <div class="flashcard-wrap" id="flashcardWrap">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="fc-front">
+          <div class="fc-label" style="color:var(--pink)">📌 Term</div>
+          <div class="fc-text" id="fcFront">Click to load flashcard</div>
+          <div class="fc-hint">Tap to reveal answer 👆</div>
+        </div>
+        <div class="fc-back">
+          <div class="fc-label" style="color:var(--teal)">💡 Answer</div>
+          <div class="fc-text" id="fcBack">Answer here</div>
+          <div class="fc-hint">Tap to flip back 🔄</div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="fc-nav-btn" onclick="prevCard()">←</button>
+      <div class="fc-count" id="fcCount">1 / 10</div>
+      <button class="fc-nav-btn" onclick="nextCard()">→</button>
+    </div>
+    <div style="text-align:center;margin-top:12px">
+      <button onclick="shuffleCards()" style="padding:8px 20px;border-radius:14px;border:2px solid var(--border);background:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;color:var(--purple)">🔀 Shuffle Cards</button>
+    </div>
+  </div>
+
+  <!-- MINDMAP -->
+  <div class="panel" id="panel-mindmap">
+    <div class="content-card" style="overflow-x:auto">
+      <div class="card-header">
+        <div class="card-icon" style="background:#EEF0FF">🗺️</div>
+        <div class="card-title" style="color:var(--purple)">Visual Mind Map</div>
+      </div>
+      <svg class="mindmap-svg" id="mindmapSvg" viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+
+  <!-- AUDIO -->
+  <div class="panel" id="panel-audio">
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#FFF0FB">🎙️</div>
+        <div class="card-title" style="color:var(--pink)">Audio Study Mode</div>
+      </div>
+      <div class="audio-modes">
+        <button class="audio-mode-btn active" onclick="setAudioMode('summary',this)">📖 Summary</button>
+        <button class="audio-mode-btn" onclick="setAudioMode('eli5',this)">🧒 Simple Explain</button>
+        <button class="audio-mode-btn" onclick="setAudioMode('keypoints',this)">⭐ Key Points</button>
+        <button class="audio-mode-btn" onclick="setAudioMode('quiz',this)">🎯 Quiz Review</button>
+      </div>
+      <div class="audio-player-card">
+        <div class="audio-art" id="audioArt">📖</div>
+        <div class="audio-title" id="audioTitle">Chapter Summary</div>
+        <div class="audio-sub" id="audioSub">Select a mode and press play</div>
+        <div class="waveform-vis" id="waveformVis"></div>
+        <div class="audio-progress">
+          <div class="progress-track" onclick="seekAudio(event)">
+            <div class="progress-fill" id="audioPFill" style="width:0%"></div>
+          </div>
+          <div class="time-row">
+            <span id="audioCurTime">0:00</span>
+            <span id="audioTotTime">0:00</span>
+          </div>
+        </div>
+        <div class="audio-controls">
+          <button class="ac-btn" onclick="audioSkip(-10)" title="Rewind 10s">⏮</button>
+          <button class="ac-play" id="audioPlayBtn" onclick="toggleAudio()">▶</button>
+          <button class="ac-btn" onclick="audioSkip(10)" title="Forward 10s">⏭</button>
+          <button class="ac-btn" onclick="stopAudio()" title="Stop">⏹</button>
+        </div>
+        <div class="lang-row">
+          <span style="font-size:12px;font-weight:800;color:var(--muted)">Language:</span>
+          <button class="lang-audio-btn active" id="langEnBtn" onclick="setAudioLang('en')">🇬🇧 English</button>
+          <button class="lang-audio-btn" id="langHiBtn" onclick="setAudioLang('hi')">🇮🇳 Hindi</button>
+        </div>
+        <div class="speed-control">
+          <span style="font-size:12px;font-weight:800;color:var(--muted)">Speed:</span>
+          <button class="speed-btn active" onclick="setSpeed(0.75,this)">0.75x</button>
+          <button class="speed-btn active" onclick="setSpeed(1,this)" id="speed1">1x</button>
+          <button class="speed-btn" onclick="setSpeed(1.25,this)">1.25x</button>
+          <button class="speed-btn" onclick="setSpeed(1.5,this)">1.5x</button>
+          <button class="speed-btn" onclick="setSpeed(2,this)">2x</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="height:60px"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+const chaptersData = {
+  "10-science": ["Ch 1 – Chemical Reactions","Ch 2 – Acids, Bases & Salts","Ch 3 – Metals & Non-Metals","Ch 4 – Carbon Compounds","Ch 5 – Periodic Classification","Ch 6 – Life Processes","Ch 7 – Control & Coordination","Ch 8 – Reproduction","Ch 9 – Heredity & Evolution","Ch 10 – Light","Ch 11 – Human Eye","Ch 12 – Electricity","Ch 13 – Magnetic Effects","Ch 14 – Energy Sources","Ch 15 – Environment"],
+  "9-science": ["Ch 1 – Matter in Surroundings","Ch 2 – Is Matter Around Pure","Ch 3 – Atoms & Molecules","Ch 4 – Structure of Atom","Ch 5 – Cell: Fundamental Unit","Ch 6 – Tissues","Ch 7 – Diversity in Living","Ch 8 – Motion","Ch 9 – Force & Laws of Motion","Ch 10 – Gravitation","Ch 11 – Work & Energy","Ch 12 – Sound","Ch 13 – Why Do We Fall Ill","Ch 14 – Natural Resources"],
+  "8-science": ["Ch 1 – Crop Production","Ch 2 – Microorganisms","Ch 3 – Synthetic Fibres","Ch 4 – Metals & Non-Metals","Ch 5 – Coal & Petroleum","Ch 6 – Combustion","Ch 7 – Conservation of Plants","Ch 8 – Cell Structure","Ch 9 – Reproduction in Animals","Ch 10 – Reaching Age of Adolescence","Ch 11 – Force & Pressure","Ch 12 – Friction","Ch 13 – Sound","Ch 14 – Chemical Effects","Ch 15 – Stars & Solar System","Ch 16 – Pollution of Air & Water"],
+  "10-maths": ["Ch 1 – Real Numbers","Ch 2 – Polynomials","Ch 3 – Linear Equations","Ch 4 – Quadratic Equations","Ch 5 – Arithmetic Progressions","Ch 6 – Triangles","Ch 7 – Coordinate Geometry","Ch 8 – Introduction to Trigonometry","Ch 9 – Applications of Trigonometry","Ch 10 – Circles","Ch 11 – Constructions","Ch 12 – Areas Related to Circles","Ch 13 – Surface Areas & Volumes","Ch 14 – Statistics","Ch 15 – Probability"],
+  "default": ["Ch 1 – Introduction","Ch 2 – Core Concepts","Ch 3 – Applications","Ch 4 – Advanced Topics","Ch 5 – Review & Practice"]
+};
+
+let quizData = { easy:[], medium:[], hard:[] };
+let flashcards = [];
+let currentLevel = 'easy';
+let currentQ = 0;
+let answers = {};
+let fcIndex = 0;
+let audioLang = 'en';
+let audioMode = 'summary';
+let audioSpeech = null;
+let isPlaying = false;
+let audioText = '';
+let waveInterval = null;
+let uiLang = 'en';
+let appData = {};
+let audioProgress = 0;
+let audioDuration = 0;
+let audioProgressInterval = null;
+
+const uiStrings = {
+  en: { heroTitle:'Study Smarter,\nScore Higher! 🚀', heroSub:'Pick your grade and chapter — AI instantly builds your complete study kit!', selTitle:'Choose Your Chapter', genBtn:'Generate My Study Kit!' },
+  hi: { heroTitle:'स्मार्ट पढ़ो,\nऊँचे नंबर लाओ! 🚀', heroSub:'अपनी कक्षा और पाठ चुनें — AI तुरंत तुम्हारी पूरी स्टडी किट बनाएगा!', selTitle:'अपना पाठ चुनें', genBtn:'मेरी स्टडी किट बनाओ!' }
+};
+
+function setUILang(l) {
+  uiLang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const s = uiStrings[l];
+  document.getElementById('hero-title').innerHTML = l === 'hi'
+    ? '<span class="g1">स्मार्ट</span> <span class="g2">पढ़ो,</span><br><span class="g3">ऊँचे नंबर लाओ! 🚀</span>'
+    : '<span class="g1">Study</span> <span class="g2">Smarter,</span><br><span class="g3">Score Higher! 🚀</span>';
+  document.getElementById('hero-sub').textContent = s.heroSub;
+  document.getElementById('sel-title').textContent = s.selTitle;
+  document.getElementById('genBtnText').textContent = s.genBtn;
+}
+
+function scrollToSelector() {
+  document.getElementById('selectorSection').scrollIntoView({behavior:'smooth'});
+}
+
+function updateChapters() {
+  const g = document.getElementById('gradeSelect').value;
+  const s = document.getElementById('subjectSelect').value;
+  const key = g && s ? `${g}-${s}` : null;
+  const chapters = key && chaptersData[key] ? chaptersData[key] : (g && s ? chaptersData['default'] : []);
+  const sel = document.getElementById('chapterSelect');
+  sel.innerHTML = '<option value="">— Select Chapter —</option>';
+  chapters.forEach(c => { const o = document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function launchConfetti() {
+  const colors = ['#FF6B9D','#FF9F43','#FFD93D','#6BCB77','#4ECDC4','#A29BFE','#45B7D1'];
+  for (let i = 0; i < 40; i++) {
+    setTimeout(() => {
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.style.left = Math.random()*100+'vw';
+      c.style.top = '-20px';
+      c.style.background = colors[Math.floor(Math.random()*colors.length)];
+      c.style.transform = `rotate(${Math.random()*360}deg)`;
+      c.style.animationDuration = (1.5+Math.random()*2)+'s';
+      c.style.width = (6+Math.random()*8)+'px';
+      c.style.height = (6+Math.random()*8)+'px';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 3000);
+    }, i * 60);
+  }
+}
+
+const loadingMessages = [
+  "🧠 AI is reading the chapter...",
+  "📝 Crafting smart summary...",
+  "🎯 Generating 45 quiz questions...",
+  "🃏 Building flashcards...",
+  "🗺️ Drawing mind map...",
+  "🎙️ Preparing audio scripts...",
+  "✨ Almost ready..."
+];
+
+async function generateAll() {
+  const grade = document.getElementById('gradeSelect').value;
+  const subject = document.getElementById('subjectSelect').value;
+  const chapter = document.getElementById('chapterSelect').value;
+  if (!grade || !subject || !chapter) { showToast('⚠️ Please select grade, subject and chapter!'); return; }
+
+  const btn = document.getElementById('genBtn');
+  btn.classList.add('loading');
+  document.getElementById('genBtnText').textContent = 'Generating...';
+
+  const bar = document.getElementById('loadingBar');
+  const loadText = document.getElementById('loadingText');
+  bar.style.width = '0%';
+  let msgIdx = 0;
+  const msgInterval = setInterval(() => {
+    loadText.textContent = loadingMessages[msgIdx % loadingMessages.length];
+    msgIdx++;
+  }, 900);
+  const barInterval = setInterval(() => {
+    const cur = parseFloat(bar.style.width) || 0;
+    if (cur < 88) bar.style.width = (cur + Math.random()*6) + '%';
+  }, 300);
+
+  try {
+    const prompt = `You are an expert Indian school teacher for CBSE/ICSE. Generate a complete study kit for:
+Grade: ${grade}, Subject: ${subject}, Chapter: ${chapter}
+
+Return ONLY valid JSON (no markdown, no backticks) with this exact structure:
+{
+  "chapterName": "full chapter name",
+  "summary": "A detailed 4-6 sentence summary of the chapter covering all main concepts",
+  "keyPoints": ["point 1","point 2","point 3","point 4","point 5","point 6"],
+  "examPredictions": ["Most likely exam topic 1","Most likely exam topic 2","Most likely exam topic 3","Most likely exam topic 4"],
+  "flashcards": [
+    {"term":"Term 1","definition":"Clear definition 1"},
+    {"term":"Term 2","definition":"Clear definition 2"},
+    {"term":"Term 3","definition":"Clear definition 3"},
+    {"term":"Term 4","definition":"Clear definition 4"},
+    {"term":"Term 5","definition":"Clear definition 5"},
+    {"term":"Term 6","definition":"Clear definition 6"},
+    {"term":"Term 7","definition":"Clear definition 7"},
+    {"term":"Term 8","definition":"Clear definition 8"}
+  ],
+  "mindmap": {
+    "center": "Chapter Topic",
+    "branches": [
+      {"label":"Branch 1","children":["item1","item2","item3"]},
+      {"label":"Branch 2","children":["item1","item2","item3"]},
+      {"label":"Branch 3","children":["item1","item2"]},
+      {"label":"Branch 4","children":["item1","item2"]}
+    ]
+  },
+  "quiz": {
+    "easy": [
+      {"q":"Question?","options":["A","B","C","D"],"answer":0,"explanation":"Why A is correct"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":1,"explanation":"Why B is correct"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":2,"explanation":"Why C is correct"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":0,"explanation":"explanation"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":3,"explanation":"explanation"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":1,"explanation":"explanation"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":0,"explanation":"explanation"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":2,"explanation":"explanation"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":1,"explanation":"explanation"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":3,"explanation":"explanation"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":0,"explanation":"explanation"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":1,"explanation":"explanation"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":2,"explanation":"explanation"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":0,"explanation":"explanation"},
+      {"q":"Question?","options":["A","B","C","D"],"answer":3,"explanation":"explanation"}
+    ],
+    "medium": [
+      {"q":"Application question?","options":["A","B","C","D"],"answer":1,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":0,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":2,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":3,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":1,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":2,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":0,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":1,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":3,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":2,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":0,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":1,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":2,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":3,"explanation":"explanation"},
+      {"q":"Application question?","options":["A","B","C","D"],"answer":0,"explanation":"explanation"}
+    ],
+    "hard": [
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":2,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":0,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":3,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":1,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":2,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":0,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":3,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":1,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":2,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":0,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":3,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":1,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":2,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":0,"explanation":"explanation"},
+      {"q":"Analysis question?","options":["A","B","C","D"],"answer":3,"explanation":"explanation"}
+    ]
+  },
+  "audioSummary": "A 3-4 sentence spoken summary of the chapter suitable for audio playback",
+  "audioELI5": "A simple 3-4 sentence explanation using everyday examples a 12-year-old would understand",
+  "audioKeyPoints": "The 5 most important points from this chapter, read as a list",
+  "audioHindi": "चैप्टर का हिंदी में 3-4 वाक्यों का सारांश जो बोलने के लिए उपयुक्त हो"
+}`;
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:4000,
+        messages:[{role:"user",content:prompt}]
+      })
+    });
+    const data = await response.json();
+    let raw = data.content.map(i=>i.text||'').join('');
+    raw = raw.replace(/```json|```/g,'').trim();
+    appData = JSON.parse(raw);
+
+    clearInterval(msgInterval);
+    clearInterval(barInterval);
+    bar.style.width = '100%';
+    loadText.textContent = '✅ Study kit ready!';
+
+    setTimeout(() => {
+      renderAll(appData, chapter);
+      btn.classList.remove('loading');
+      document.getElementById('genBtnText').textContent = uiLang === 'hi' ? 'मेरी स्टडी किट बनाओ!' : 'Generate My Study Kit!';
+      bar.style.width = '0%';
+      loadText.textContent = '';
+      document.getElementById('tabsWrap').style.display = 'block';
+      document.getElementById('tabsWrap').scrollIntoView({behavior:'smooth', block:'start'});
+      launchConfetti();
+      showToast('🎉 Your study kit is ready!');
+    }, 600);
+
+  } catch(e) {
+    clearInterval(msgInterval);
+    clearInterval(barInterval);
+    loadText.textContent = '❌ Error: ' + e.message;
+    bar.style.width = '0%';
+    btn.classList.remove('loading');
+    document.getElementById('genBtnText').textContent = 'Try Again';
+    showToast('❌ Something went wrong. Try again!');
+  }
+}
+
+function renderAll(d, chapterName) {
+  // Summary
+  document.getElementById('summary-chapter-name').textContent = d.chapterName || chapterName;
+  document.getElementById('summaryText').textContent = d.summary;
+  const colors = ['#FF6B9D','#FF9F43','#FFD93D','#6BCB77','#4ECDC4','#A29BFE','#FF7675'];
+  const kpList = document.getElementById('keyPointsList');
+  kpList.innerHTML = '';
+  (d.keyPoints||[]).forEach((p,i) => {
+    kpList.innerHTML += `<li><div class="kp-dot" style="background:${colors[i%colors.length]}">${i+1}</div><span>${p}</span></li>`;
+  });
+  const epList = document.getElementById('examPredList');
+  epList.innerHTML = '';
+  (d.examPredictions||[]).forEach((p,i) => {
+    epList.innerHTML += `<li><div class="kp-dot" style="background:${colors[(i+2)%colors.length]}">🎯</div><span>${p}</span></li>`;
+  });
+
+  // Quiz
+  quizData = d.quiz || {easy:[],medium:[],hard:[]};
+  currentLevel = 'easy';
+  currentQ = 0;
+  answers = {};
+  renderQuiz();
+
+  // Flashcards
+  flashcards = d.flashcards || [];
+  fcIndex = 0;
+  renderFlashcard();
+
+  // Mind map
+  if (d.mindmap) renderMindmap(d.mindmap);
+
+  // Audio
+  audioText = d.audioSummary || d.summary;
+  appData.audioELI5 = d.audioELI5;
+  appData.audioKeyPoints = d.audioKeyPoints;
+  appData.audioHindi = d.audioHindi;
+  document.getElementById('audioSub').textContent = d.chapterName || chapterName;
+}
+
+// ===== QUIZ =====
+function renderQuiz() {
+  const qs = quizData[currentLevel];
+  if (!qs || !qs.length) return;
+  const q = qs[currentQ];
+  document.getElementById('qCounter').textContent = `Q ${currentQ+1} / ${qs.length}`;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('explanationBox').style.display = 'none';
+  const opts = document.getElementById('qOptions');
+  opts.innerHTML = '';
+  const answered = answers[currentLevel] && answers[currentLevel][currentQ] !== undefined;
+  q.options.forEach((o,i) => {
+    const b = document.createElement('button');
+    b.className = 'opt-btn';
+    b.textContent = ['A','B','C','D'][i] + ') ' + o;
+    if (answered) {
+      b.disabled = true;
+      if (i === q.answer) b.classList.add('correct');
+      else if (i === answers[currentLevel][currentQ]) b.classList.add('wrong');
+    } else {
+      b.onclick = () => selectAnswer(i);
+    }
+    opts.appendChild(b);
+  });
+  if (answered) {
+    const exBox = document.getElementById('explanationBox');
+    exBox.textContent = '💡 ' + q.explanation;
+    exBox.style.display = 'block';
+  }
+  renderProgressStrip();
+}
+
+function selectAnswer(idx) {
+  if (!answers[currentLevel]) answers[currentLevel] = {};
+  answers[currentLevel][currentQ] = idx;
+  renderQuiz();
+}
+
+function renderProgressStrip() {
+  const qs = quizData[currentLevel];
+  const strip = document.getElementById('progressStrip');
+  strip.innerHTML = '';
+  qs.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'p-dot';
+    if (answers[currentLevel] && answers[currentLevel][i] !== undefined) {
+      d.classList.add(answers[currentLevel][i] === qs[i].answer ? 'correct' : 'wrong');
+    }
+    if (i === currentQ) d.style.outline = '2px solid var(--teal)';
+    strip.appendChild(d);
+  });
+}
+
+function prevQ() {
+  if (currentQ > 0) { currentQ--; renderQuiz(); }
+}
+
+function nextQ() {
+  const qs = quizData[currentLevel];
+  if (currentQ < qs.length - 1) { currentQ++; renderQuiz(); }
+  else showScore();
+}
+
+function showScore() {
+  const qs = quizData[currentLevel];
+  const ans = answers[currentLevel] || {};
+  let score = 0;
+  qs.forEach((q,i) => { if (ans[i] === q.answer) score++; });
+  const pct = Math.round(score/qs.length*100);
+  const emoji = pct >= 80 ? '🏆' : pct >= 60 ? '😊' : '💪';
+  document.getElementById('quizCard').innerHTML = `
+    <div class="score-board">
+      <h2>${emoji} Level Complete!</h2>
+      <div style="font-size:14px;color:var(--muted);font-weight:700;margin-bottom:8px">${currentLevel.toUpperCase()} Level</div>
+      <div class="score-circle"><div class="score-num">${score}</div><div class="score-total">out of ${qs.length}</div></div>
+      <div style="font-size:28px;font-weight:900;color:var(--pink);margin:8px 0">${pct}%</div>
+      <div style="font-size:14px;color:var(--muted);font-weight:700;margin-bottom:20px">${pct>=80?'Excellent! 🌟':pct>=60?'Good job! Keep going!':'Keep practicing! You can do it!'}</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button onclick="retryLevel()" style="padding:10px 20px;border-radius:14px;border:2px solid var(--border);background:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;color:var(--teal)">🔄 Retry</button>
+        <button onclick="nextLevel()" style="padding:10px 20px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--green),var(--teal));color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer">Next Level →</button>
+      </div>
+    </div>`;
+  launchConfetti();
+}
+
+function retryLevel() {
+  if (answers[currentLevel]) delete answers[currentLevel];
+  currentQ = 0;
+  const qc = document.getElementById('quizCard');
+  qc.innerHTML = `<div class="q-text" id="qText"></div><div class="options" id="qOptions"></div><div class="explanation-box" id="explanationBox"></div><div class="q-nav"><button class="nav-btn" onclick="prevQ()">← Prev</button><button class="nav-btn primary" id="nextQBtn" onclick="nextQ()">Next →</button></div>`;
+  renderQuiz();
+}
+
+function nextLevel() {
+  const levels = ['easy','medium','hard'];
+  const idx = levels.indexOf(currentLevel);
+  if (idx < 2) {
+    currentLevel = levels[idx+1];
+    currentQ = 0;
+    document.querySelectorAll('.level-pill').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.level-pill')[idx+1].classList.add('active');
+    const qc = document.getElementById('quizCard');
+    qc.innerHTML = `<div class="q-text" id="qText"></div><div class="options" id="qOptions"></div><div class="explanation-box" id="explanationBox"></div><div class="q-nav"><button class="nav-btn" onclick="prevQ()">← Prev</button><button class="nav-btn primary" id="nextQBtn" onclick="nextQ()">Next →</button></div>`;
+    renderQuiz();
+  } else {
+    showToast('🏆 All levels completed! You are a champion!');
+  }
+}
+
+function setLevel(l, btn) {
+  currentLevel = l;
+  currentQ = 0;
+  document.querySelectorAll('.level-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const qc = document.getElementById('quizCard');
+  qc.innerHTML = `<div class="q-text" id="qText"></div><div class="options" id="qOptions"></div><div class="explanation-box" id="explanationBox"></div><div class="q-nav"><button class="nav-btn" onclick="prevQ()">← Prev</button><button class="nav-btn primary" id="nextQBtn" onclick="nextQ()">Next →</button></div>`;
+  renderQuiz();
+}
+
+// ===== FLASHCARDS =====
+function renderFlashcard() {
+  if (!flashcards.length) return;
+  const fc = flashcards[fcIndex];
+  document.getElementById('fcFront').textContent = fc.term;
+  document.getElementById('fcBack').textContent = fc.definition;
+  document.getElementById('fcCount').textContent = `${fcIndex+1} / ${flashcards.length}`;
+  document.getElementById('flashcard').classList.remove('flipped');
+}
+
+function flipCard() { document.getElementById('flashcard').classList.toggle('flipped'); }
+function prevCard() { if(fcIndex>0){fcIndex--;renderFlashcard();} }
+function nextCard() { if(fcIndex<flashcards.length-1){fcIndex++;renderFlashcard();} }
+function shuffleCards() {
+  for(let i=flashcards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[flashcards[i],flashcards[j]]=[flashcards[j],flashcards[i]];}
+  fcIndex=0; renderFlashcard(); showToast('🔀 Cards shuffled!');
+}
+
+// ===== MINDMAP =====
+function renderMindmap(data) {
+  const svg = document.getElementById('mindmapSvg');
+  svg.innerHTML = '';
+  const W=700,H=420,cx=350,cy=210;
+  const colors=['#FF6B9D','#FF9F43','#4ECDC4','#A29BFE','#6BCB77','#45B7D1'];
+  // Center
+  const cg = document.createElementNS('http://www.w3.org/2000/svg','g');
+  const cr = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+  cr.setAttribute('cx',cx);cr.setAttribute('cy',cy);cr.setAttribute('rx',80);cr.setAttribute('ry',34);
+  cr.setAttribute('fill','#FFD93D');cr.setAttribute('stroke','#E6B800');cr.setAttribute('stroke-width','2');
+  const ct = document.createElementNS('http://www.w3.org/2000/svg','text');
+  ct.setAttribute('x',cx);ct.setAttribute('y',cy+5);ct.setAttribute('text-anchor','middle');
+  ct.setAttribute('font-family','Fredoka One,cursive');ct.setAttribute('font-size','14');ct.setAttribute('fill','#7A5000');
+  ct.textContent = data.center.length>14 ? data.center.slice(0,13)+'…' : data.center;
+  cg.appendChild(cr);cg.appendChild(ct);svg.appendChild(cg);
+
+  const branches = data.branches||[];
+  const angles = branches.length === 4 ? [225,315,45,135] : branches.map((_,i)=>i*(360/branches.length)-90);
+  branches.forEach((branch,i) => {
+    const angle = angles[i] * Math.PI/180;
+    const bx = cx + Math.cos(angle)*160;
+    const by = cy + Math.sin(angle)*100;
+    // Branch line
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',cx);line.setAttribute('y1',cy);line.setAttribute('x2',bx);line.setAttribute('y2',by);
+    line.setAttribute('stroke',colors[i%colors.length]);line.setAttribute('stroke-width','3');line.setAttribute('stroke-dasharray','0');
+    svg.appendChild(line);
+    // Branch node
+    const bg = document.createElementNS('http://www.w3.org/2000/svg','g');
+    const br = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    const label = branch.label.length>14 ? branch.label.slice(0,13)+'…' : branch.label;
+    br.setAttribute('x',bx-55);br.setAttribute('y',by-18);br.setAttribute('width','110');br.setAttribute('height','36');
+    br.setAttribute('rx','18');br.setAttribute('fill',colors[i%colors.length]);br.setAttribute('opacity','0.9');
+    const bt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    bt.setAttribute('x',bx);bt.setAttribute('y',by+5);bt.setAttribute('text-anchor','middle');
+    bt.setAttribute('font-family','Nunito,sans-serif');bt.setAttribute('font-size','11');bt.setAttribute('font-weight','800');bt.setAttribute('fill','white');
+    bt.textContent = label;
+    bg.appendChild(br);bg.appendChild(bt);svg.appendChild(bg);
+    // Children
+    (branch.children||[]).forEach((child,j) => {
+      const spread = (j-(branch.children.length-1)/2)*0.6;
+      const cAngle = angle + spread;
+      const ccx = bx + Math.cos(cAngle)*90;
+      const ccy = by + Math.sin(cAngle)*60;
+      const cl = document.createElementNS('http://www.w3.org/2000/svg','line');
+      cl.setAttribute('x1',bx);cl.setAttribute('y1',by);cl.setAttribute('x2',ccx);cl.setAttribute('y2',ccy);
+      cl.setAttribute('stroke',colors[i%colors.length]);cl.setAttribute('stroke-width','1.5');cl.setAttribute('opacity','0.5');
+      svg.appendChild(cl);
+      const cc = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      cc.setAttribute('cx',ccx);cc.setAttribute('cy',ccy);cc.setAttribute('r','28');
+      cc.setAttribute('fill',colors[i%colors.length]);cc.setAttribute('opacity','0.15');
+      svg.appendChild(cc);
+      const childText = child.length > 12 ? child.slice(0,11)+'…' : child;
+      const ct2 = document.createElementNS('http://www.w3.org/2000/svg','text');
+      ct2.setAttribute('x',ccx);ct2.setAttribute('y',ccy+4);ct2.setAttribute('text-anchor','middle');
+      ct2.setAttribute('font-family','Nunito,sans-serif');ct2.setAttribute('font-size','9');ct2.setAttribute('font-weight','700');
+      ct2.setAttribute('fill',colors[i%colors.length]);
+      ct2.textContent = childText;
+      svg.appendChild(ct2);
+    });
+  });
+}
+
+// ===== AUDIO =====
+function setAudioLang(l) {
+  audioLang = l;
+  document.getElementById('langEnBtn').classList.toggle('active', l==='en');
+  document.getElementById('langHiBtn').classList.toggle('active', l==='hi');
+  if (isPlaying) { stopAudio(); }
+}
+
+function setAudioMode(mode, btn) {
+  audioMode = mode;
+  document.querySelectorAll('.audio-mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const modeMap = { summary:{art:'📖',title:'Chapter Summary'}, eli5:{art:'🧒',title:'Simple Explanation'}, keypoints:{art:'⭐',title:'Key Points'}, quiz:{art:'🎯',title:'Quiz Review'} };
+  const m = modeMap[mode];
+  document.getElementById('audioArt').textContent = m.art;
+  document.getElementById('audioTitle').textContent = m.title;
+  if (isPlaying) stopAudio();
+}
+
+function getAudioText() {
+  if (audioLang === 'hi') return appData.audioHindi || appData.summary || '';
+  if (audioMode === 'eli5') return appData.audioELI5 || appData.summary || '';
+  if (audioMode === 'keypoints') return appData.audioKeyPoints || (appData.keyPoints||[]).join('. ') || '';
+  if (audioMode === 'quiz') return 'Here is a quick quiz review. ' + (quizData.easy||[]).slice(0,3).map((q,i)=>`Question ${i+1}: ${q.q} The answer is: ${q.options[q.answer]}.`).join(' ');
+  return appData.audioSummary || appData.summary || '';
+}
+
+function buildWaveform() {
+  const vis = document.getElementById('waveformVis');
+  vis.innerHTML = '';
+  for (let i=0;i<30;i++){
+    const b = document.createElement('div');
+    b.className = 'w-bar';
+    b.style.height = (8+Math.random()*28)+'px';
+    b.style.background = ['#FF6B9D','#FF9F43','#4ECDC4','#A29BFE','#6BCB77'][Math.floor(Math.random()*5)];
+    vis.appendChild(b);
+  }
+}
+
+function animateWave() {
+  const bars = document.querySelectorAll('.w-bar');
+  bars.forEach(b => { b.style.height = (8+Math.random()*32)+'px'; });
+}
+
+function toggleAudio() {
+  if (!appData.summary) { showToast('⚠️ Generate a study kit first!'); return; }
+  if (isPlaying) { pauseAudio(); return; }
+  const text = getAudioText();
+  if (!text) { showToast('⚠️ No content available for this mode'); return; }
+  if (window.speechSynthesis.paused && audioSpeech) {
+    window.speechSynthesis.resume();
+    isPlaying = true;
+    document.getElementById('audioPlayBtn').textContent = '⏸';
+    waveInterval = setInterval(animateWave, 200);
+    startProgressTimer();
+    return;
+  }
+  window.speechSynthesis.cancel();
+  audioSpeech = new SpeechSynthesisUtterance(text);
+  audioSpeech.lang = audioLang === 'hi' ? 'hi-IN' : 'en-IN';
+  audioSpeech.rate = currentSpeed;
+  audioSpeech.pitch = 1.1;
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length) {
+    const preferred = voices.find(v => v.lang === (audioLang==='hi'?'hi-IN':'en-IN')) ||
+                      voices.find(v => v.lang.startsWith(audioLang==='hi'?'hi':'en'));
+    if (preferred) audioSpeech.voice = preferred;
+  }
+  audioDuration = text.split(' ').length * (audioLang==='hi'?0.5:0.4) / currentSpeed;
+  audioProgress = 0;
+  document.getElementById('audioTotTime').textContent = fmtTime(audioDuration);
+  buildWaveform();
+  audioSpeech.onend = () => {
+    isPlaying = false;
+    document.getElementById('audioPlayBtn').textContent = '▶';
+    clearInterval(waveInterval);
+    clearInterval(audioProgressInterval);
+    document.getElementById('audioPFill').style.width = '100%';
+    document.getElementById('audioCurTime').textContent = fmtTime(audioDuration);
+  };
+  window.speechSynthesis.speak(audioSpeech);
+  isPlaying = true;
+  document.getElementById('audioPlayBtn').textContent = '⏸';
+  waveInterval = setInterval(animateWave, 200);
+  startProgressTimer();
+}
+
+function startProgressTimer() {
+  clearInterval(audioProgressInterval);
+  audioProgressInterval = setInterval(() => {
+    audioProgress = Math.min(audioProgress + currentSpeed, audioDuration);
+    const pct = Math.round(audioProgress/audioDuration*100);
+    document.getElementById('audioPFill').style.width = pct + '%';
+    document.getElementById('audioCurTime').textContent = fmtTime(audioProgress);
+  }, 1000);
+}
+
+function pauseAudio() {
+  window.speechSynthesis.pause();
+  isPlaying = false;
+  document.getElementById('audioPlayBtn').textContent = '▶';
+  clearInterval(waveInterval);
+  clearInterval(audioProgressInterval);
+}
+
+function stopAudio() {
+  window.speechSynthesis.cancel();
+  isPlaying = false;
+  audioSpeech = null;
+  audioProgress = 0;
+  document.getElementById('audioPlayBtn').textContent = '▶';
+  document.getElementById('audioPFill').style.width = '0%';
+  document.getElementById('audioCurTime').textContent = '0:00';
+  clearInterval(waveInterval);
+  clearInterval(audioProgressInterval);
+}
+
+function audioSkip(s) {
+  audioProgress = Math.max(0, Math.min(audioDuration, audioProgress + s));
+  document.getElementById('audioPFill').style.width = Math.round(audioProgress/audioDuration*100) + '%';
+  document.getElementById('audioCurTime').textContent = fmtTime(audioProgress);
+}
+
+function seekAudio(e) {
+  const r = e.currentTarget.getBoundingClientRect();
+  const pct = (e.clientX - r.left) / r.width;
+  audioProgress = pct * audioDuration;
+  document.getElementById('audioPFill').style.width = Math.round(pct*100) + '%';
+  document.getElementById('audioCurTime').textContent = fmtTime(audioProgress);
+}
+
+let currentSpeed = 1;
+function setSpeed(s, btn) {
+  currentSpeed = s;
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (audioSpeech) { audioSpeech.rate = s; }
+  if (isPlaying) { stopAudio(); showToast('Speed changed to '+s+'x — press play again'); }
+}
+
+function fmtTime(s) {
+  const m = Math.floor(s/60);
+  const sec = Math.floor(s%60);
+  return m+':'+(sec<10?'0':'')+sec;
+}
+
+function showPanel(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+window.speechSynthesis.onvoiceschanged = () => {};
+buildWaveform();
+</script>
+</body>
+</html>
